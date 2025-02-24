@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 st.title("Expenses and Budget Analyzer")
 
+st.set_page_config(
+    page_title='Expenses and Budget Analyzer',page_icon='📊')
 # Add Expense Form
 with st.form("expense_form"):
     st.write("Add New Expense")
