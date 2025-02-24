@@ -83,3 +83,29 @@ if uploaded_file is not None:
     st.session_state.expenses = pd.read_csv(uploaded_file)
     st.session_state.expenses["Date"] = pd.to_datetime(st.session_state.expenses["Date"])
     st.sidebar.success("Expenses loaded successfully!")
+
+if "expenses" in st.session_state and not st.session_state.expenses.empty:
+    st.write("### Outlier Detection (Expenses greater than 1.5 * IQR)")
+    
+    # Calculate IQR (Interquartile Range) to detect outliers
+    Q1 = st.session_state.expenses["Amount"].quantile(0.25)
+    Q3 = st.session_state.expenses["Amount"].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    outliers = st.session_state.expenses[(st.session_state.expenses["Amount"] < lower_bound) | (st.session_state.expenses["Amount"] > upper_bound)]
+    if not outliers.empty:
+        st.write("Outliers detected:")
+        st.write(outliers)
+    else:
+        st.write("No outliers detected.")
+
+if "expenses" in st.session_state and not st.session_state.expenses.empty:
+    total_expenses = st.session_state.expenses["Amount"].sum()
+    spending_to_budget_ratio = total_expenses / budget
+    st.write(f"### Spending-to-Budget Ratio: {spending_to_budget_ratio:.2f}")
+    if spending_to_budget_ratio > 1:
+        st.error("You have exceeded your budget!")
+    else:
+        st.success(f"You are within your budget. ({spending_to_budget_ratio * 100:.2f}% spent)")
