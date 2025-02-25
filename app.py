@@ -2,15 +2,17 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-st.title("Expenses and Budget Analyzer")
+
+
+st.title("📊Expenses & Budget Analyzer")
 
 # Add Expense Form
+st.subheader("📝 Add New Expense")
 with st.form("expense_form"):
-    st.write("Add New Expense")
     category = st.selectbox("Category", ["Food", "Transport", "Entertainment", "Books", "Other"])
     amount = st.number_input("Amount (₹)", min_value=0)
     date = st.date_input("Date")
-    submit_button = st.form_submit_button("Add Expense")
+    submit_button = st.form_submit_button("➕ Add Expense")
 
 # Store Expenses
 if submit_button:
@@ -22,16 +24,16 @@ if submit_button:
     # Ensure the "Date" column is of datetime type
     st.session_state.expenses["Date"] = pd.to_datetime(st.session_state.expenses["Date"])
     
-    st.success("Expense added successfully!")
+    st.success("✅ Expense added successfully!")
 
 # Display Expenses
 if "expenses" in st.session_state:
-    st.write("### Your Expenses")
+    st.subheader("📄 Your Expenses")
     st.dataframe(st.session_state.expenses)
 
 # Visualize Spending
 if "expenses" in st.session_state and not st.session_state.expenses.empty:
-    st.write("### Spending by Category")
+    st.subheader("📊 Spending by Category")
     category_totals = st.session_state.expenses.groupby("Category")["Amount"].sum()
     fig, ax = plt.subplots()
     ax.pie(category_totals, labels=category_totals.index, autopct="%1.1f%%", startangle=90)
@@ -39,14 +41,15 @@ if "expenses" in st.session_state and not st.session_state.expenses.empty:
     st.pyplot(fig)
 
 # Budget Feature
-budget = st.slider("Set Monthly Budget (₹)", min_value=0, max_value=100000, value=5000)
+st.sidebar.title("💰 Budget Settings")
+budget = st.sidebar.slider("Set Monthly Budget (₹)", min_value=0, max_value=100000, value=5000)
 if "expenses" in st.session_state and not st.session_state.expenses.empty:
     total_expenses = st.session_state.expenses["Amount"].sum()
     st.write(f"### Total Expenses: ₹{total_expenses}")
     if total_expenses > budget:
-        st.error("You have exceeded your budget!")
+        st.sidebar.error("🚨 You have exceeded your budget!")
     else:
-        st.success(f"You are within your budget. Remaining: ₹{budget - total_expenses}")
+        st.sidebar.success(f"✅ You are within your budget. Remaining: ₹{budget - total_expenses}")
 
 # Save and Load Data
 if st.button("Save Expenses to CSV"):
@@ -60,7 +63,7 @@ if uploaded_file is not None:
     # Ensure the "Date" column is of datetime type after loading CSV
     st.session_state.expenses["Date"] = pd.to_datetime(st.session_state.expenses["Date"])
     
-    st.success("Expenses loaded successfully!")
+    st.success("✅ Expenses loaded successfully!")
 if "expenses" in st.session_state and not st.session_state.expenses.empty:
     # Total and Average monthly expenses
     total_expenses = st.session_state.expenses["Amount"].sum()
